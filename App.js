@@ -1,25 +1,54 @@
+import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { StripeProvider } from "@stripe/stripe-react-native";
+
 import ProductDetailScreen from "./screens/ProductDetailsScreen";
 import CategoriesScreen from "./screens/CategoriesScreen";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import colors from "./constants/colors";
-import CustomTabIcon from "./components/ui/CustomTabIcon";
 import HomeScreen from "./screens/HomeScreen";
-import AntDesign from "@expo/vector-icons/AntDesign";
 import ProductsScreen from "./screens/ProductsScreen";
 import CartScreen from "./screens/CartScreen";
 import CheckoutScreen from "./screens/CheckoutScreen";
 import OrderSuccessScreen from "./screens/OrderSuccessScreen";
-import { StripeProvider } from "@stripe/stripe-react-native";
+import OrderStack from "./navigation/OrderStack";
+import AccountStack from "./navigation/AccountStack";
+import SignOutScreen from "./screens/user/SignOut";
+import { UserMenu } from "./components/user/UserMenu";
+import CustomTabIcon from "./components/ui/CustomTabIcon";
+import colors from "./constants/colors";
 
+const TopTab = createMaterialTopTabNavigator();
+const BottomTab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-const BottomTab = createBottomTabNavigator();
+/** Account Top Tabs */
+const AccountTabs = () => (
+  <View style={{ flex: 1 }}>
+    <View
+      style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 1 }}
+    >
+      <UserMenu />
+    </View>
+    <TopTab.Navigator
+      screenOptions={{
+        tabBarStyle: { marginTop: 100 },
+      }}
+    >
+      <TopTab.Screen name="My Orders" component={OrderStack} />
+      <TopTab.Screen name="My Account" component={AccountStack} />
+      <TopTab.Screen name="Sign Out" component={SignOutScreen} />
+    </TopTab.Navigator>
+  </View>
+);
 
+/** Bottom Tab Navigator */
 function BottomNavigation() {
   return (
     <BottomTab.Navigator
@@ -84,10 +113,29 @@ function BottomNavigation() {
           ),
         }}
       />
+      <BottomTab.Screen
+        name="Account"
+        component={AccountTabs}
+        options={{
+          headerShown: false,
+          // title: "Tài khoản", // Bạn có thể thêm title nếu cần
+          headerTitleAlign: "center",
+          tabBarIcon: ({ color, size, focused }) => (
+            <CustomTabIcon focused={focused} size={size} color={color}>
+              <Icon
+                name="person"
+                color={focused ? colors["primary-800"] : color}
+                size={focused ? size + 4 : size}
+              />
+            </CustomTabIcon>
+          ),
+        }}
+      />
     </BottomTab.Navigator>
   );
 }
 
+/** Stack Navigator */
 function StackNavigator() {
   return (
     <NavigationContainer>
